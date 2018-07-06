@@ -1,5 +1,4 @@
-import urllib.request
-import http.cookiejar
+import WxNetwork
 import time
 import json
 import os
@@ -11,12 +10,6 @@ except:
 	print("需要pip安装XlsxWrite第三方库")
 
 wxToken = {}
-def getR():
-	randomTicket = str(random.random())[2:]+'1'#"-1577634346"
-	return randomTicket
-
-def dropHTML(_rawData):
-	return None
 
 def wxGetLoginToken():
 	jsLoginURL = "https://login.wx.qq.com/jslogin?appid=wx782c26e4c19acffb"
