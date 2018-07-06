@@ -8,11 +8,15 @@ class WxInterface:
 	def getToken(self):
 		return self.wxToken
 	
-	def login(self, QRCodeFilename="qrcode.jpg", autoOpen=False):
-		import os, time, json
+	def login(self, QRCodeFilename="qrcode.jpg", autoOpen=True):
+		import os, time, json, sys
 		self.wxToken["loginQRToken"] = self.bot.getLoginToken()
-		with open(QRCodeFilename, "wb") as QRCode:
-			QRCode.write(self.bot.getQRCode(self.wxToken["loginQRToken"]))
+		try:
+			with open(QRCodeFilename, "wb") as QRCode:
+				QRCode.write(self.bot.getQRCode(self.wxToken["loginQRToken"]))
+		except:
+			print("写入二维码错误")
+			sys.exit()
 		print("使用手机扫描二维码图片" + str(QRCodeFilename) + "以登录")
 		if autoOpen:
 			os.system('call %s' % QRCodeFilename)
@@ -32,6 +36,9 @@ class WxInterface:
 		self.wxToken["wxsid"] = wxWebWechatToken.split("<wxsid>")[1].split("</wxsid>")[0]
 		self.wxToken["wxuin"] = wxWebWechatToken.split("<wxuin>")[1].split("</wxuin>")[0]
 		self.wxToken["pass_ticket"] = wxWebWechatToken.split("<pass_ticket>")[1].split("</pass_ticket>")[0]
+		if self.wxToken["pass_ticket"] == "":
+			print("无法获取用户凭据，可能当天登陆次数过多，触发登录频率限制")
+			sys.exit()
 		self.wxToken.pop("redirectURL")
 		
 		self.wxInitData = json.loads(self.bot.wxInit(self.wxToken))
@@ -43,11 +50,14 @@ class WxInterface:
 		print("==========你好，" + self.wxToken["displayname"] + "！==========")
 	
 	def printRecentContacts(self):
-		print("最近联系人为:")
-		for recentCommunicatePerson in self.wxInitData["ContactList"]:
-			displayName = recentCommunicatePerson["RemarkName"] or recentCommunicatePerson["NickName"]
-			print("\t" + displayName)
-		print("\t目前共有" + str(wxContacts["MemberCount"]) + "位好友")
+		if len(self.wxInitData["ContactList"]):
+			print("最近联系人为:")
+			for recentCommunicatePerson in self.wxInitData["ContactList"]:
+				displayName = recentCommunicatePerson["RemarkName"] or recentCommunicatePerson["NickName"]
+				print("\t" + displayName)
+			print("\t目前共有" + str(self.wxContacts["MemberCount"]) + "位好友")
+		else:
+			print("没有最近联系人")
 	
 	def findFriend(self, keyword):
 		findResult = []
@@ -60,6 +70,8 @@ class WxInterface:
 		print('发送消息')
 		while True:
 			contactTo = input("请输入要发送消息的联系人:")
+			if contactTo == "":
+				return
 			searchedList = self.findFriend(contactTo)
 			if len(searchedList):
 				print("找到以下联系人")
@@ -74,7 +86,8 @@ class WxInterface:
 			contactToId = searchedList[0]["UserName"]
 		
 		wxMessage = input("请输入消息:\n")
-		self.bot.sendMessage(wxToken, contactToId, wxMessage)
+		if wxMessage != "":
+			self.bot.sendMessage(self.wxToken, contactToId, wxMessage)
 	
 	def exportContactUI(self):
 		print("正在尝试导出联系人列表")

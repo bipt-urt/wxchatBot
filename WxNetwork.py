@@ -19,12 +19,21 @@ class WxNetwork:
 	
 	def get(self, url, codecs="utf-8"):
 		'Send a HTTP GET request to target server'
-		return urllib.request.urlopen(url).read().decode(codecs)
+		try:
+			return urllib.request.urlopen(url).read().decode(codecs)
+		except:
+			print("网络无法连接")
 	
 	def getRaw(self, url):
 		'Send a HTTP GET request and dont decode it in order to get raw data'
-		return urllib.request.urlopen(url).read()
+		try:
+			return urllib.request.urlopen(url).read()
+		except:
+			print("网络无法连接")
 	
 	def post(self, url, postData, codecs="utf-8"):
 		'Send a HTTP POST request to target server'
-		return urllib.request.urlopen(url, json.dumps(postData, ensure_ascii=False).encode(codecs)).read().decode(codecs)
+		try:
+			return urllib.request.urlopen(url, json.dumps(postData, ensure_ascii=False).encode(codecs)).read().decode(codecs)
+		except:
+			print("网络无法连接")
