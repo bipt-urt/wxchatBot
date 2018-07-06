@@ -114,4 +114,4 @@ class WxInterface:
 	
 	def exportGroupUI(self):
 		print('导出群组信息')
-		self.bot.exportGroup()
+		self.bot.exportGroup(self.wxContacts)

@@ -156,26 +156,12 @@ class WxBot:
 		os.system('call %s' % "echarts.htm")
 		return None
 	
-	def exportGroup(self):
+	def exportGroup(self, contactsList):
 		import os
-		listg = []
-		try:
-			with open('data.csv','r', encoding="gb18030") as f:
-				for line in f:
-					row = []
-					if line.find("@@") == -1:
-						continue
-					line = line.split(",")
-					for element in line:
-						row.append(element)
-					listg.append(row)
-		except:
-			print("在导出群组时发生异常")
-		with open("group.csv", "w", encoding="gb18030", newline="") as groupcsv:
-			for i in listg:
-				response7 = i
-				response7 = str(response7)
-				groupcsv.write(response7 + '\n')
+		with open("group.csv", "w", encoding="gb18030") as groupcsv:
+			for group in contactsList["MemberList"]:
+				if group["UserName"].find("@@") != -1:
+					groupcsv.write(group["NickName"] + "," + group["UserName"] + "\n")
 		os.system('call %s' % "group.csv")
 
 		return None
