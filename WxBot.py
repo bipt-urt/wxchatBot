@@ -4,7 +4,6 @@ class WxBot:
 	
 	def __init__(self):
 		self.wxNet = WxNetwork.WxNetwork()
-		self.wxToken = []
 	
 	def getR(self):
 		import random
@@ -46,7 +45,7 @@ class WxBot:
 		getContactURL = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?pass_ticket=" + wxToken["pass_ticket"] + "&r=" + self.getR() + "&seq=0&skey=" + wxToken["skey"]
 		return self.wxNet.get(getContactURL)
 	
-	def wxSendMsg(self, wxToken, sendTo, sendMessage):
+	def sendMessage(self, wxToken, sendTo, sendMessage):
 		sendMessageURL = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?pass_ticket=" + wxToken["pass_ticket"]
 		postData = {
 			'BaseRequest': self.buildBaseRequest(wxToken),
@@ -62,7 +61,7 @@ class WxBot:
 		}
 		return self.wxNet.post(sendMessageURL, postData)
 	
-	def exportContect(_contactsList, _exportFileName = "friendslist.xlsx"):
+	def exportContect(self, _contactsList, _exportFileName = "friendslist.xlsx"):
 		import os
 		try:
 			import xlsxwriter
@@ -92,7 +91,7 @@ class WxBot:
 		os.system('call %s' % Filename)
 		return None
 	
-	def exportECharts(_locationStatics, _filename = "echarts.htm"):
+	def exportECharts(self, _locationStatics, _filename = "echarts.htm"):
 		import os, json
 		chartsList = []
 		for location in _locationStatics:
@@ -157,7 +156,7 @@ class WxBot:
 		os.system('call %s' % "echarts.htm")
 		return None
 	
-	def exportGroup():
+	def exportGroup(self):
 		listg = []
 		with open('data.csv','r', encoding="gb18030") as f:
 			for line in f:
@@ -168,14 +167,10 @@ class WxBot:
 				for element in line:
 					row.append(element)
 				listg.append(row)
-		if Debug:
-			print(list7)
 		with open("group.csv", "w", encoding="gb18030", newline="") as groupcsv:
 			for i in listg:
 				response7 = i
 				response7 = str(response7)
-				if Debug:
-					print(response7)
 				groupcsv.write(response7 + '\n')
 		os.system('call %s' % "group.csv")
 		return None
