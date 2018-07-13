@@ -165,6 +165,73 @@ class WxBot:
 		os.system('call %s' % "group.csv")
 
 		return None
+	
+	def sendImage(self, wxToken, sendTo, imageLocation):
+		import os.path
+		import hashlib
+		if os.path.isfile(imageLocation) == False:
+			print("发送图片不存在")
+			return False
+		sendImageURL = 'https://file.wx.qq.com/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json'
+		self.wxNet.options(sendImageURL)
+		payLoad = []
+		randomValue = self.getR()
+		hashm = ""
+		imageContent = None
+		with open(imageLocation, 'rb') as f:
+			imageContent = f.read()
+			hashm = hashlib.new('md5', imageContent).hexdigest()
+		print("要发送" + imageLocation + ", MD5值为:" + hashm)
+		for item in self.wxNet.getCookie():
+			if item.name == "webwx_data_ticket":
+				wxToken["webwx_data_ticket"] = item.value
+				break
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="id"')
+		payLoad.append("")
+		payLoad.append("WU_FILE_1")
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="name"')
+		payLoad.append("")
+		payLoad.append(imageLocation)
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="type"')
+		payLoad.append("")
+		payLoad.append("image/jpeg")
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="size"')
+		payLoad.append("")
+		payLoad.append(str(os.path.getsize(imageLocation)))
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="mediatype"')
+		payLoad.append("")
+		payLoad.append("pic")
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="uploadmediarequest"')
+		payLoad.append("")
+		payLoad.append('{"UploadType":2,"BaseRequest":{"Uin":' + wxToken["wxuin"] + ',"Sid":"' + wxToken["wxsid"] + '","Skey":"' + wxToken["skey"] + '","DeviceID":"e878530504072308"},"ClientMediaId":1531445280921,"TotalLen":' + str(os.path.getsize(imageLocation)) + ',"StartPos":0,"DataLen":' + str(os.path.getsize(imageLocation)) + ',"MediaType":4,"FromUserName":"' + wxToken["username"] + '","ToUserName":"' + sendTo + '","FileMd5":"' + hashm + '"}')
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="webwx_data_ticket"')
+		payLoad.append("")
+		payLoad.append(wxToken["webwx_data_ticket"])
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="pass_ticket"')
+		payLoad.append("")
+		payLoad.append(wxToken["pass_ticket"])
+		payLoad.append("-----------------------------" + randomValue)
+		payLoad.append('Content-Disposition: form-data; name="filename"; filename="' + imageLocation + '"')
+		payLoad.append('Content-Type: image/jpeg')
+		payLoad.append("")
+		payLoad.append(imageContent)
+		payLoad.append("-----------------------------" + randomValue + "--")
+		newPayLoad = []
+		for element in payLoad:
+			if type(element) == str:
+				newPayLoad.append(element.encode("utf-8"))
+		newPayLoad = b"\r\n".join(newPayLoad)
+		ans = self.wxNet.postPayload(sendImageURL, newPayLoad)
+		print(ans)
+		return True
 
 def unitTest():
 	bot = WxBot()

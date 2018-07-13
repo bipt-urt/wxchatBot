@@ -19,7 +19,6 @@ def main():
 			ui.locationStaticUI()
 		if task == '4':
 			ui.exportGroupUI()
-			task = False
 		else:
 			print("\n----------1 : 发送一条消息\n----------2 ：导出联系人列表\n----------3 ：统计联系人信息(饼图)\n----------4 ：输出所有群组\n----------tune : 调试模式\n---------- 回车：退出\n")
 			task = input("请输入操作编号")
