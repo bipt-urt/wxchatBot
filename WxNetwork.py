@@ -37,3 +37,22 @@ class WxNetwork:
 			return urllib.request.urlopen(url, json.dumps(postData, ensure_ascii=False).encode(codecs)).read().decode(codecs)
 		except:
 			print("网络无法连接")
+	
+	def postPayload(self, url, payload, codecs="utf-8"):
+		'Send a HTTP POST request to a target server via raw payload'
+		try:
+			return urllib.request.urlopen(url, payload).read().decode(codecs)
+		except:
+			print("网络无法连接 while postPayload")
+	
+	def options(self, url, codecs="utf-8"):
+		'Send a HTTP OPTIONS request to a target server with (possible) url argument'
+		requestHandle = urllib.request.Request(url)
+		requestHandle.get_method = lambda: 'OPTIONS'
+		try:
+			return urllib.request.urlopen(requestHandle).read().decode(codecs)
+		except:
+			print("网络无法连接")
+	
+	def getCookie(self):
+		return self.cj

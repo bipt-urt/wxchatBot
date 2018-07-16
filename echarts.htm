@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 	<head>
@@ -51,3 +52,58 @@
 		</script>
 	</div></div></div></div></body>
 </html>
+=======
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+		<link href="css/allstyle.css" rel="stylesheet" type="text/css"> 	</head>
+	<body><div class="outer"><div class="middle"><div class="inner"><div id="login-main">
+		<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+		<div id="main" style="width: 600px;height:400px;"></div>
+		<script>
+			var myChart = echarts.init(document.getElementById('main'));
+			var option = {
+			tooltip: {
+				trigger: 'item',
+				formatter: "{a} <br/>{b}: {c} ({d}%)"
+			},
+			legend: {
+				orient: 'vertical',
+				x: 'left',
+				data:["北京", "江苏", "广东", "上海", "浙江", "四川", "河北", "贵州", "England", "Barcelona"]
+			},
+			series: [
+				{
+					name:'访问来源',
+					type:'pie',
+					radius: ['50%', '70%'],
+					avoidLabelOverlap: false,
+					label: {
+						normal: {
+							show: false,
+							position: 'center'
+						},
+						emphasis: {
+							show: true,
+							textStyle: {
+								fontSize: '30',
+								fontWeight: 'bold'
+							}
+						}
+					},
+					labelLine: {
+						normal: {
+							show: false
+						}
+					},
+					data: 
+[{"value": 165, "name": "北京"}, {"value": 11, "name": "江苏"}, {"value": 10, "name": "广东"}, {"value": 8, "name": "上海"}, {"value": 8, "name": "浙江"}, {"value": 4, "name": "四川"}, {"value": 4, "name": "河北"}, {"value": 3, "name": "贵州"}, {"value": 3, "name": "England"}, {"value": 2, "name": "Barcelona"}]				}
+			]
+		};
+		myChart.setOption(option);
+		</script>
+	</div></div></div></div></body>
+</html>
+>>>>>>> af6649656171b68a1761bc20f237797b67625c07

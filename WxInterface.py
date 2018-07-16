@@ -67,6 +67,7 @@ class WxInterface:
 		return findResult
 	
 	def sendMessageUI(self):
+		import os.path
 		print('发送消息')
 		while True:
 			contactTo = input("请输入要发送消息的联系人:")
@@ -87,7 +88,10 @@ class WxInterface:
 		
 		wxMessage = input("请输入消息:\n")
 		if wxMessage != "":
-			self.bot.sendMessage(self.wxToken, contactToId, wxMessage)
+			if os.path.exists(wxMessage):
+				self.bot.sendImage(self.wxToken, contactToId, wxMessage)
+			else:
+				self.bot.sendMessage(self.wxToken, contactToId, wxMessage)
 	
 	def exportContactUI(self):
 		print("正在尝试导出联系人列表")
