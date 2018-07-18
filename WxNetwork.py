@@ -38,10 +38,23 @@ class WxNetwork:
 		except:
 			print("网络无法连接")
 	
-	def postPayload(self, url, payload, codecs="utf-8"):
+	def postPayload(self, url, payload, boundary, codecs="utf-8"):
 		'Send a HTTP POST request to a target server via raw payload'
 		try:
-			return urllib.request.urlopen(url, payload).read().decode(codecs)
+			payloadOpener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+			payloadOpener.addheaders = [
+				('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0'),
+				('Host', 'wx.qq.com'),
+				('Accept', 'application/json, text/plain, */*'),
+				('Accept-Language', 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2'),
+				('Referer', 'https://wx.qq.com/'),
+				('DNT', '1'),
+				('Content-Type', 'multipart/form-data; boundary=' + boundary)
+			]
+			urllib.request.install_opener(payloadOpener)
+			rtn = urllib.request.urlopen(url, payload).read().decode(codecs)
+			urllib.request.install_opener(self.opener)
+			return rtn
 		except:
 			print("网络无法连接")
 	

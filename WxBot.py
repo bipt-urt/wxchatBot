@@ -177,6 +177,7 @@ class WxBot:
 		payLoad = []
 		randomValue = self.getR()
 		hashm = ""
+		boundary = "-----------------------------" + randomValue
 		imageContent = None
 		with open(imageLocation, 'rb') as f:
 			imageContent = f.read()
@@ -229,7 +230,7 @@ class WxBot:
 			if type(element) == str:
 				newPayLoad.append(element.encode("utf-8"))
 		newPayLoad = b"\r\n".join(newPayLoad)
-		ans = self.wxNet.postPayload(sendImageURL, newPayLoad)
+		ans = self.wxNet.postPayload(sendImageURL + "&pass_ticket=" + wxToken["pass_ticket"], newPayLoad, boundary)
 		print(ans)
 		return True
 
