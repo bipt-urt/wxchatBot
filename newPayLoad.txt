@@ -1,0 +1,41 @@
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="id"
+
+WU_FILE_0
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="name"
+
+2.jpg
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="type"
+
+image/jpeg
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="lastModifiedDate"
+
+Wed Jun 27 2018 16:52:28 GMT+0800 (中国标准时间)
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="size"
+
+4590388
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="mediatype"
+
+pic
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="uploadmediarequest"
+
+{"UploadType":2,"BaseRequest":{"Uin":1952541924,"Sid":"WO4jyD540xKdu7HG","Skey":"@crypt_bb0777dc_cb59d5d4db0c8490795826dfdb878a9c","DeviceID":"e878530504072308"},"ClientMediaId":1531445280921,"TotalLen":4590388,"StartPos":0,"DataLen":4590388,"MediaType":4,"FromUserName":"@16c6d75b7183b3e697929caa4530d0a37c074712ce9a8dc62ddfab3713baec37","ToUserName":"@cdac3ab5d6464d6e2a267ea1c2c7e9de","FileMd5":"d27fd94deb57e7c2572d7af9c77cef23"}
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="webwx_data_ticket"
+
+gSfGgzjQ1jfy0dwdO/czcjfV
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="pass_ticket"
+
+4tCW3DpEh%2B6EkGDSq0CYUT5NiVa9A%2BMhFqT9VGLVh%2BUJG3N3dHR1qH6zFgvRm2J1
+------WebKitFormBoundary63537004225328991
+Content-Disposition: form-data; name="filename"; filename="2.jpg"
+Content-Type: image/jpeg
+
+------WebKitFormBoundary63537004225328991--

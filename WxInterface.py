@@ -89,7 +89,10 @@ class WxInterface:
 		wxMessage = input("请输入消息:\n")
 		if wxMessage != "":
 			if os.path.exists(wxMessage):
-				self.bot.sendImage(self.wxToken, contactToId, wxMessage)
+				self.bot.webwxuploadmedia(self.wxToken,wxMessage)
+				self.bot.webwxsendmsgimg(self.wxToken, contactToId , media_id)
+			#	self.bot.webwxuploadmedia(self, image_name):
+			#	self.bot.sendImage(self.wxToken, contactToId, wxMessage)
 			else:
 				self.bot.sendMessage(self.wxToken, contactToId, wxMessage)
 	

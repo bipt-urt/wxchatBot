@@ -1,9 +1,13 @@
 import WxNetwork
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+import os
+import time
 class WxBot:
 	'WxBot is a Python application to operate your WeChat use web WeChat API'
 	
 	def __init__(self):
 		self.wxNet = WxNetwork.WxNetwork()
+		self.media_count = -1
 	
 	def getR(self):
 		import random
@@ -165,10 +169,128 @@ class WxBot:
 		os.system('call %s' % "group.csv")
 
 		return None
-	
+
+	def webwxuploadmedia(self,wxToken,image_dir):
+		from requests_toolbelt.multipart.encoder import MultipartEncoder
+		import os
+		import time
+		import random
+		import json
+		import mimetypes
+		import urllib.request
+		import requests
+		url = 'https://file.wx.qq.com/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json'
+		image_name = image_dir#.split('\\')[-1]
+		# 计数器
+		self.media_count = self.media_count + 1
+		# 文件名
+		file_name = image_name
+		# MIME格式
+		# mime_type = application/pdf, image/jpeg, image/png, etc.
+		mime_type = mimetypes.guess_type(image_name, strict=False)[0]
+		# 微信识别的文档格式，微信服务器应该只支持两种类型的格式。pic和doc
+		# pic格式，直接显示。doc格式则显示为文件。
+		media_type = 'pic' if mime_type.split('/')[0] == 'image' else 'doc'
+		# 上一次修改日期
+		lastModifieDate = 'Thu Mar 17 2017 03:55:10 GMT+0800 (CST)'
+		# 文件大小
+		file_size = os.path.getsize(file_name)
+		# PassTicket
+		pass_ticket = wxToken["pass_ticket"]
+		# clientMediaId
+		client_media_id = str(int(time.time() * 1000)) +str(random.random())[:5].replace('.', '')
+		# webwx_data_ticket
+		webwx_data_ticket = ''
+		for item in self.wxNet.getCookie():
+			if item.name == 'webwx_data_ticket':
+				webwx_data_ticket = item.value
+				break
+		if (webwx_data_ticket == ''):
+			return "Cookie Failed "
+		global BaseRequest
+		BaseRequest = {
+			"Uin":wxToken["wxuin"],
+			"Sid":wxToken["wxsid"],
+			"Skey":wxToken["skey"],
+			"DeviceID":"e878530504072308"
+		}
+		uploadmediarequest = json.dumps({
+			"BaseRequest": BaseRequest,
+			"ClientMediaId": client_media_id,
+			"TotalLen": file_size,
+			"StartPos": 0,
+			"DataLen": file_size,
+			"MediaType": 4
+		}, ensure_ascii=False).encode('utf8')
+
+		multipart_encoder = MultipartEncoder(
+			fields={
+				'id': 'WU_FILE_' + str(self.media_count),
+				'name': file_name,
+				'type': mime_type,
+				'lastModifieDate': lastModifieDate,
+				'size': str(file_size),
+				'mediatype': media_type,
+				'uploadmediarequest': uploadmediarequest,
+				'webwx_data_ticket': webwx_data_ticket,
+				'pass_ticket': pass_ticket,
+				'filename': (file_name, open(file_name, 'rb'), mime_type.split('/')[1])
+			},
+			boundary='-----------------------------1575017231431605357584454111'
+		)
+		print('multipart_encoder:'+multipart_encoder.content_type+' \n \n')
+		print(multipart_encoder)
+		headers = {
+			'Host': 'file.wx.qq.com',
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',
+			'Accept': '*/*',
+			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+			'Accept-Encoding': 'gzip, deflate , br',
+			'Referer': 'wx.qq.com',
+			'Content-Type': multipart_encoder.content_type,
+			'Origin': 'wx.qq.com',
+			'Connection': 'keep-alive',
+			'Pragma': 'no-cache',
+			'Cache-Control': 'no-cache'
+		}
+		opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.wxNet.cj))
+		#r = opener.open(urllib.request.Request(url,multipart_encoder,headers)).read().decode("utf-8")
+		#print(r.read().decode('utf-8'))
+		r = requests.post(url, data=multipart_encoder, headers=headers)
+		print(r.read().decode('utf-8'))
+		response_json = r.json()
+		if response_json['BaseResponse']['Ret'] == 0:
+			return response_json
+		return None
+
+	def webwxsendmsgimg(self, wxToken,user_id, media_id):
+		url = 'https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsgimg?fun=async&f=json&pass_ticket=%s' % self.pass_ticket
+		clientMsgId = str(int(time.time() * 1000)) + \
+			str(random.random())[:5].replace('.', '')
+		data_json = {
+			"BaseRequest":BaseRequest,
+			"Msg": {
+				"Type": 3,
+				"MediaId": media_id,
+				"FromUserName": self.User['UserName'],
+				"ToUserName": user_id,
+				"LocalID": clientMsgId,
+				"ClientMsgId": clientMsgId
+			}
+		}
+		headers = {'content-type': 'application/json; charset=UTF-8'}
+		data = json.dumps(data_json, ensure_ascii=False).encode('utf8')
+		r = requests.post(url, data=data, headers=headers)
+		dic = r.json()
+		return dic['BaseResponse']['Ret'] == 0
+
 	def sendImage(self, wxToken, sendTo, imageLocation):
 		import os.path
 		import hashlib
+		import pickle
+		import urllib
+		import http.cookiejar
+
 		if os.path.isfile(imageLocation) == False:
 			print("发送图片不存在")
 			return False
@@ -176,14 +298,13 @@ class WxBot:
 
 		print(self.wxNet.options(sendImageURL))
 		payLoad = []
-		randomValue = 'ByvAcWaXNn5tT1tI'
+		randomValue = str( self.getR() )
 		hashm = ""
 		imageContent = None
 		with open(imageLocation, 'rb') as f:
 			imageContent = f.read()
 			hashm = hashlib.new('md5', imageContent).hexdigest()
 		print("要发送" + imageLocation + ", MD5值为:" + hashm)
-
 		for item in self.wxNet.getCookie():
 			print(item)
 			if item.name == "webwx_data_ticket":
@@ -237,22 +358,30 @@ class WxBot:
 		payLoad.append('Content-Disposition: form-data; name="filename"; filename="' + imageName + '"')
 		payLoad.append('Content-Type: image/jpeg')
 		payLoad.append("")
-		payLoad.append(imageContent)
-		#print(imageContent)
+		payLoad.append( pickle.dumps(imageContent) )
+		print(pickle.dumps(imageContent))
 		payLoad.append("------WebKitFormBoundary" + randomValue + "--")
 		newPayLoad = []
 		for element in payLoad:
 			if type(element) == str:
 				newPayLoad.append(element.encode("utf-8"))
 		newPayLoad = b"\r\n".join(newPayLoad)
-		import urllib
+		with open('newPayLoad.txt', 'wb') as f:
+			f.write(newPayLoad)
+		
+		
 		print('randomValue' + randomValue)
 		self.wxNet.opener.addheaders = [
-			('Accept-Encoding', 'gzip, deflate, br'),
-			('Content-Type','multipart/form-data; boundary=----'+randomValue )
+			('Content-Type','multipart/form-data;boundary=----'+randomValue)
 		]
+		cookies=self.wxNet.getCookie()
+		header = {'Content-Type':'multipart/form-data;boundary=----'+randomValue}
+		req = urllib.request.Request(sendImageURL,newPayLoad,header)
+		
+		opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.wxNet.cj))
+		ans = opener.open(req).read().decode("utf-8")
 
-		ans = urllib.request.urlopen(sendImageURL,newPayLoad).read().decode("utf-8")
+		#ans=self.wxNet.opener.open( sendImageURL , newPayLoad ).read().decode("utf-8")
 		#ans = self.wxNet.postPayload(sendImageURL, newPayLoad)
 		print(ans)
 		return True
