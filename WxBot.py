@@ -300,6 +300,7 @@ class WxBot:
 		payLoad = []
 		randomValue = str( self.getR() )
 		hashm = ""
+		boundary = "-----------------------------" + randomValue
 		imageContent = None
 		with open(imageLocation, 'rb') as f:
 			imageContent = f.read()
